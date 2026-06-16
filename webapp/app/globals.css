@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  /* Light theme — warm earthy paper */
+  --color-bg: 247 244 238;          /* #F7F4EE */
+  --color-surface: 255 253 248;     /* near-white card */
+  --color-surface-2: 240 235 224;   /* sunken */
+  --color-border: 226 219 204;
+  --color-fg: 20 30 22;
+  --color-muted: 110 108 100;
+
+  --color-brand: 47 93 58;          /* #2F5D3A deep field green */
+  --color-brand-fg: 247 244 238;
+  --color-brand-soft: 217 232 215;
+
+  --color-accent-ph: 14 116 144;    /* teal */
+  --color-accent-moist: 161 98 7;   /* warm amber for dry side */
+
+  --color-ok: 22 128 60;
+  --color-warn: 202 138 4;
+  --color-danger: 185 28 28;
+}
+
+.dark {
+  --color-bg: 12 16 14;
+  --color-surface: 19 24 21;
+  --color-surface-2: 25 31 27;
+  --color-border: 41 50 44;
+  --color-fg: 232 234 228;
+  --color-muted: 154 158 148;
+
+  --color-brand: 134 196 134;
+  --color-brand-fg: 12 16 14;
+  --color-brand-soft: 35 60 42;
+
+  --color-accent-ph: 56 189 213;
+  --color-accent-moist: 234 179 8;
+
+  --color-ok: 74 222 128;
+  --color-warn: 250 204 21;
+  --color-danger: 248 113 113;
+}
+
+html,
+body {
+  background: rgb(var(--color-bg));
+  color: rgb(var(--color-fg));
+}
+
+body {
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle grid backdrop for hero */
+.field-grid {
+  background-image:
+    linear-gradient(rgb(var(--color-border) / 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--color-border) / 0.4) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+.numeric {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Range input styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 100%;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  background: rgb(var(--color-surface-2));
+  border-radius: 999px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  margin-top: -6px;
+  background: rgb(var(--color-brand));
+  border: 2px solid rgb(var(--color-surface));
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.2);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  background: rgb(var(--color-surface-2));
+  border-radius: 999px;
+}
+input[type="range"]::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  background: rgb(var(--color-brand));
+  border: 2px solid rgb(var(--color-surface));
+  border-radius: 999px;
+  cursor: pointer;
+}
