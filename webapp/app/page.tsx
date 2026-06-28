@@ -1,43 +1,66 @@
 "use client";
 
-import { useState } from "react";
-import { Droplets, Beaker, AlertTriangle, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Droplets, Beaker } from "lucide-react";
 import { Topbar } from "@/components/layout/topbar";
 import { HeroIllustration } from "@/components/graphics/hero-illustration";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { LiveIndicator } from "@/components/dashboard/live-indicator";
+import { ConnectionStatus } from "@/components/dashboard/connection-status";
 import { StatTile } from "@/components/dashboard/stat-tile";
 import { SensorGauge } from "@/components/dashboard/sensor-gauge";
 import { ReadingChart } from "@/components/dashboard/reading-chart";
 import { StatusPill } from "@/components/dashboard/status-pill";
 import {
+  useConfig,
   useEffectiveThresholds,
   useLatestReading,
   useNodes,
   useReadings,
 } from "@/lib/data/use-store";
-import { simulateBreach } from "@/lib/data/store";
 import { fmtMoist, fmtPh } from "@/lib/format";
 import { readingSeverity } from "@/lib/thresholds";
-import { useToast } from "@/components/ui/toast";
 
 export default function DashboardPage() {
   const nodes = useNodes();
-  const [nodeId, setNodeId] = useState(nodes[0]?.id ?? "node-001");
+  const config = useConfig();
+  const [nodeId, setNodeId] = useState<string>("");
+
+  useEffect(() => {
+    if (!nodes.length) return;
+    if (!nodes.some((n) => n.id === nodeId)) setNodeId(nodes[0].id);
+  }, [nodes, nodeId]);
+
+  if (!nodes.length) return <NoNodesView />;
+
+  return (
+    <ConnectedDashboard
+      nodeId={nodeId || nodes[0].id}
+      onNodeChange={setNodeId}
+      sampleIntervalS={config.sample_interval_s}
+    />
+  );
+}
+
+function ConnectedDashboard({
+  nodeId,
+  onNodeChange,
+  sampleIntervalS,
+}: {
+  nodeId: string;
+  onNodeChange: (id: string) => void;
+  sampleIntervalS: number;
+}) {
+  const nodes = useNodes();
   const latest = useLatestReading(nodeId);
   const readings = useReadings(nodeId);
   const thresholds = useEffectiveThresholds(nodeId);
-  const toast = useToast();
 
   const sparkPh = readings.slice(-40).map((r) => r.ph);
   const sparkMoist = readings.slice(-40).map((r) => r.moisture_pct);
 
-  const phSeverity = latest
-    ? readingSeverity(latest, "ph", thresholds)
-    : "ok";
+  const phSeverity = latest ? readingSeverity(latest, "ph", thresholds) : "ok";
   const moistSeverity = latest
     ? readingSeverity(latest, "moisture", thresholds)
     : "ok";
@@ -50,7 +73,7 @@ export default function DashboardPage() {
         right={
           <Select
             value={nodeId}
-            onChange={(e) => setNodeId(e.target.value)}
+            onChange={(e) => onNodeChange(e.target.value)}
             aria-label="Select node"
           >
             {nodes.map((n) => (
@@ -69,9 +92,12 @@ export default function DashboardPage() {
           <div className="relative grid md:grid-cols-[1.2fr_1fr] gap-4 p-6 md:p-8">
             <div className="flex flex-col justify-between gap-5 min-w-0">
               <div className="space-y-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <Badge tone="brand">BANTAY-ANI</Badge>
-                  <LiveIndicator />
+                  <ConnectionStatus
+                    latestTs={latest?.ts}
+                    sampleIntervalS={sampleIntervalS}
+                  />
                 </div>
                 <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
                   Soil pH and moisture, in real time.
@@ -86,28 +112,6 @@ export default function DashboardPage() {
                   this dashboard. Calibrate once, set thresholds, and let it
                   watch the field for you.
                 </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    simulateBreach(nodeId, "moisture");
-                    toast.push("Simulated a moisture breach", "warn");
-                  }}
-                >
-                  <Zap className="size-3.5" /> Simulate moisture breach
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    simulateBreach(nodeId, "ph");
-                    toast.push("Simulated a pH breach", "warn");
-                  }}
-                >
-                  <AlertTriangle className="size-3.5" /> Simulate pH breach
-                </Button>
               </div>
             </div>
             <div className="hidden md:block">
@@ -202,6 +206,31 @@ export default function DashboardPage() {
             </CardBody>
           </Card>
         </div>
+      </div>
+    </>
+  );
+}
+
+function NoNodesView() {
+  return (
+    <>
+      <Topbar
+        title="Field overview"
+        description="Live soil telemetry from your BANTAY-ANI nodes."
+      />
+      <div className="p-6">
+        <Card>
+          <CardBody className="flex flex-col items-center text-center py-16 px-6 gap-4">
+            <Badge tone="warn">No nodes registered</Badge>
+            <h3 className="text-lg font-semibold">Waiting for your first node</h3>
+            <p className="text-sm text-muted max-w-md">
+              Nothing in <code className="font-mono text-fg">nodes/</code> yet.
+              Seed the project with{" "}
+              <code className="font-mono text-fg">npm run seed</code>, or wait
+              for a provisioned ESP32 to post its first reading.
+            </p>
+          </CardBody>
+        </Card>
       </div>
     </>
   );

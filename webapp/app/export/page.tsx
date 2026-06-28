@@ -162,10 +162,9 @@ export default function ExportPage() {
           </CardBody>
           <CardFooter className="justify-between flex-wrap gap-3">
             <div className="text-xs text-muted max-w-md">
-              For this preview we deliver <code className="font-mono text-fg">.csv</code>{" "}
-              built in the browser. Once Firebase is connected, a server route
-              will stream a real <code className="font-mono text-fg">.xlsx</code>{" "}
-              via the <code className="font-mono text-fg">exceljs</code> package.
+              CSV is built in the browser from your selected range.{" "}
+              <code className="font-mono text-fg">.xlsx</code> export via a
+              server route is on the roadmap.
             </div>
             <Button onClick={download} disabled={!filtered.length}>
               <Download className="size-3.5" />

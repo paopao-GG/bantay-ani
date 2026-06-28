@@ -91,7 +91,6 @@ function ensureStarted() {
           readings = Object.values(perNode)
             .flat()
             .sort((a, b) => a.ts.localeCompare(b.ts));
-          // Cap memory like mock-store does.
           if (readings.length > 12000) {
             readings = readings.slice(readings.length - 12000);
           }
@@ -175,10 +174,3 @@ export async function acknowledgeAlert(id: string) {
   await updateDoc(doc(db, "alerts", id), { acknowledged: true });
 }
 
-export function simulateBreach(_nodeId: string, _metric: "ph" | "moisture") {
-  // No-op in Firestore mode. Use the test curl in the plan instead, or POST
-  // a synthetic reading via /api/readings to trigger a real alert.
-  console.warn("simulateBreach: not supported in Firestore mode");
-}
-
-export const TICK_INTERVAL_MS = 0;

@@ -13,10 +13,10 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input, Label, Select } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { ThresholdsForm } from "@/components/settings/thresholds-form";
-import { useConfig, useNodes } from "@/lib/data/use-store";
-import { updateConfig, updateNode } from "@/lib/data/store";
+import { useConfig, useLatestReading, useNodes } from "@/lib/data/use-store";
+import { updateConfig, updateNode } from "@/lib/data/firestore-store";
+import { ConnectionStatus } from "@/components/dashboard/connection-status";
 import { useToast } from "@/components/ui/toast";
 import { Save } from "lucide-react";
 
@@ -28,18 +28,6 @@ export default function SettingsPage() {
         description="Tune thresholds, sampling cadence, and per-node calibration."
       />
       <div className="p-6 space-y-6">
-        <Card>
-          <CardBody className="p-4 flex items-start gap-3 text-sm">
-            <Badge tone="brand">Preview</Badge>
-            <p className="text-muted">
-              Changes are kept in-memory for this session. Once Firebase is
-              wired in, edits here will write to{" "}
-              <code className="font-mono text-fg">config/global</code> and{" "}
-              <code className="font-mono text-fg">nodes/&#123;id&#125;</code>.
-            </p>
-          </CardBody>
-        </Card>
-
         <Tabs defaultValue="thresholds">
           <TabsList>
             <TabsTrigger value="thresholds">Thresholds</TabsTrigger>
@@ -144,13 +132,25 @@ function SamplingTab() {
 
 function NodesTab() {
   const nodes = useNodes();
+  const config = useConfig();
   const toast = useToast();
+  if (!nodes.length) {
+    return (
+      <Card>
+        <CardBody className="py-10 text-center text-sm text-muted">
+          No nodes registered yet. Seed the project or wait for a node to post
+          its first reading.
+        </CardBody>
+      </Card>
+    );
+  }
   return (
     <div className="space-y-4">
       {nodes.map((n) => (
         <NodeCard
           key={n.id}
           node={n}
+          sampleIntervalS={config.sample_interval_s}
           onSave={(patch) => {
             updateNode(n.id, patch);
             toast.push(`${n.id} updated`, "success");
@@ -163,11 +163,14 @@ function NodesTab() {
 
 function NodeCard({
   node,
+  sampleIntervalS,
   onSave,
 }: {
   node: ReturnType<typeof useNodes>[number];
+  sampleIntervalS: number;
   onSave: (patch: Partial<typeof node>) => void;
 }) {
+  const latest = useLatestReading(node.id);
   const [location, setLocation] = useState(node.location);
   const [installDate, setInstallDate] = useState(node.install_date);
   const [rawDry, setRawDry] = useState(node.raw_dry);
@@ -179,7 +182,10 @@ function NodeCard({
           <CardTitle>{node.id}</CardTitle>
           <CardDescription>{node.location}</CardDescription>
         </div>
-        <Badge tone="ok">Connected</Badge>
+        <ConnectionStatus
+          latestTs={latest?.ts}
+          sampleIntervalS={sampleIntervalS}
+        />
       </CardHeader>
       <CardBody className="grid gap-4 sm:grid-cols-2">
         <Field label="Location">
