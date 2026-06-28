@@ -19,7 +19,7 @@ import {
   useNodes,
   useReadings,
 } from "@/lib/data/use-store";
-import { simulateBreach } from "@/lib/data/mock-store";
+import { simulateBreach } from "@/lib/data/store";
 import { fmtMoist, fmtPh } from "@/lib/format";
 import { readingSeverity } from "@/lib/thresholds";
 import { useToast } from "@/components/ui/toast";

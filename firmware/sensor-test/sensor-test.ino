@@ -24,7 +24,7 @@ static const int PIN_RS485_TX   = 17;   // UART2 TX  -> MAX485 DI
 
 // ---------- Modbus ----------
 static const uint8_t  PH_SLAVE_ADDR  = 0x01;
-static const uint16_t PH_REG_ADDR    = 0x0006;   // holding register, pH ×100
+static const uint16_t PH_REG_ADDR    = 0x0000;   // holding register, pH ×10 (SN-3000 pH-only)
 static const uint32_t RS485_BAUD     = 4800;     // try 9600 if 4800 times out
 
 // ---------- Moisture calibration ----------
@@ -64,7 +64,7 @@ bool readPh(float &phOut, uint16_t &rawOut) {
   uint8_t result = phNode.readHoldingRegisters(PH_REG_ADDR, 1);
   if (result == phNode.ku8MBSuccess) {
     rawOut = phNode.getResponseBuffer(0);
-    phOut  = rawOut / 100.0f;
+    phOut  = rawOut / 10.0f;
     Serial.printf("[pH]    raw=0x%04X -> pH %.2f\n", rawOut, phOut);
     return true;
   } else {

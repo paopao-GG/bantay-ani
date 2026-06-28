@@ -8,7 +8,7 @@ import {
   getNodes,
   getReadings,
   subscribe,
-} from "./mock-store";
+} from "./store";
 import type { Alert, Config, Node, Reading, Thresholds } from "../types";
 
 function useSubscribed<T>(read: () => T): T {

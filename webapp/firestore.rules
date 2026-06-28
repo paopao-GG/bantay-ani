@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// MVP rules for PG Scarecrow.
+//   - Reads: open. Dashboard is unauthenticated for the single-tenant farm demo.
+//   - Writes: denied from clients. Only the Admin SDK (server-side, via the
+//     X-Api-Key-gated /api/readings route) can write.
+//
+// When you add Firebase Auth + /settings writes from the browser, replace the
+// `allow write: if false` lines with auth-gated rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

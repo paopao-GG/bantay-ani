@@ -16,7 +16,7 @@ import { Input, Label, Select } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ThresholdsForm } from "@/components/settings/thresholds-form";
 import { useConfig, useNodes } from "@/lib/data/use-store";
-import { updateConfig, updateNode } from "@/lib/data/mock-store";
+import { updateConfig, updateNode } from "@/lib/data/store";
 import { useToast } from "@/components/ui/toast";
 import { Save } from "lucide-react";
 
