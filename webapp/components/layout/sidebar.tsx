@@ -7,10 +7,8 @@ import {
   BellRing,
   Settings as SettingsIcon,
   Download,
-  Cpu,
 } from "lucide-react";
 import { Logo } from "@/components/graphics/logo";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/cn";
 
 const items = [
@@ -52,18 +50,6 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="p-3 border-t border-border">
-        <div className="rounded-xl border border-border bg-surface-2/60 p-3">
-          <div className="flex items-center gap-2 text-xs text-muted">
-            <Cpu className="size-3.5" />
-            <span>Firmware target</span>
-          </div>
-          <div className="mt-1 text-sm font-medium">ESP32 · v0.1.0</div>
-          <Badge tone="brand" className="mt-2">
-            Mock data
-          </Badge>
-        </div>
-      </div>
     </aside>
   );
 }

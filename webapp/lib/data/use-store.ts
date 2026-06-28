@@ -12,13 +12,11 @@ import {
 import type { Alert, Config, Node, Reading, Thresholds } from "../types";
 
 function useSubscribed<T>(read: () => T): T {
-  const [value, setValue] = useState<T>(read);
+  const [, tick] = useState(0);
   useEffect(() => {
-    setValue(read());
-    return subscribe(() => setValue(read()));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return subscribe(() => tick((n) => n + 1));
   }, []);
-  return value;
+  return read();
 }
 
 export function useNodes(): Node[] {

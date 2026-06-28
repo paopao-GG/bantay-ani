@@ -36,6 +36,7 @@ function emit() {
 
 function ensureStarted() {
   if (started) return;
+  if (typeof window === "undefined") return;
   started = true;
   const db = getDb();
 
